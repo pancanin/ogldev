@@ -35,7 +35,7 @@ static void RenderSceneCB()
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    glDrawArrays(GL_POINTS, 0, 1);
+    glDrawArrays(GL_POINTS, 0, 5);
 
     glDisableVertexAttribArray(0);
 
@@ -45,8 +45,12 @@ static void RenderSceneCB()
 
 static void CreateVertexBuffer()
 {
-    Vector3f Vertices[1];
+    Vector3f Vertices[5];
     Vertices[0] = Vector3f(0.0f, 0.0f, 0.0f);
+    Vertices[1] = Vector3f(0.5f, 0.5f, 0.0f);
+    Vertices[2] = Vector3f(-0.5f, -0.5f, 0.0f);
+    Vertices[3] = Vector3f(0.5f, -0.5f, 0.0f);
+    Vertices[4] = Vector3f(-0.5f, 0.5f, 0.0f);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -58,8 +62,8 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
-    int width = 1920;
-    int height = 1080;
+    int width = 640;
+    int height = 480;
     glutInitWindowSize(width, height);
 
     int x = 200;
