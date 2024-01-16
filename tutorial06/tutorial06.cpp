@@ -34,16 +34,20 @@ static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    static float Scale = 0.0f;
-    static float Delta = 0.005f;
+    static float offsetX = 0.0f;
+    static float offsetY = 0.0f;
+    static float spiralF = 0.0f;
 
-    Scale += Delta;
-    if ((Scale >= 1.0f) || (Scale <= -1.0f)) {
-        Delta *= -1.0f;
+    offsetX += 0.0005;
+    offsetY += 0.0005;
+
+    spiralF += 0.00005;
+    if (spiralF >= 1) {
+        spiralF = 0.0f;
     }
 
-    Matrix4f Translation(1.0f, 0.0f, 0.0f, Scale * 2,
-                         0.0f, 1.0f, 0.0f, Scale,
+    Matrix4f Translation(1.0f, 0.0f, 0.0f, std::cosf(offsetX) * spiralF,
+                         0.0f, 1.0f, 0.0f, std::sinf(offsetY) * spiralF,
                          0.0f, 0.0f, 1.0f, 0.0,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -68,9 +72,9 @@ static void RenderSceneCB()
 static void CreateVertexBuffer()
 {
     Vector3f Vertices[3];
-    Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);   // bottom left
-    Vertices[1] = Vector3f(1.0f, -1.0f, 0.0f);    // bottom right
-    Vertices[2] = Vector3f(0.0f, 1.0f, 0.0f);     // top
+    Vertices[0] = Vector3f(-0.5f, -0.5f, 0.0f);   // bottom left
+    Vertices[1] = Vector3f(0.5f, -0.5f, 0.0f);    // bottom right
+    Vertices[2] = Vector3f(0.0f, 0.5f, 0.0f);     // top
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -168,8 +172,8 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
-    int width = 1920;
-    int height = 1080;
+    int width = 640;
+    int height = 640;
     glutInitWindowSize(width, height);
 
     int x = 200;

@@ -60,8 +60,8 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
-    int width = 1920;
-    int height = 1080;
+    int width = 640;
+    int height = 640;
     glutInitWindowSize(width, height);
 
     int x = 200;
