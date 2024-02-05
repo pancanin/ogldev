@@ -35,17 +35,14 @@
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skydome.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skydome_technique.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\geomip_grid.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\lod_manager.cpp" />
     <ClCompile Include="..\..\..\Terrain13\midpoint_disp_terrain.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\simple_water.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\simple_water_technique.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\terrain_technique.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain_demo13.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\triangle_list.cpp" />
+    <ClCompile Include="..\..\..\Terrain13\terrain_technique.cpp" />
+    <ClCompile Include="..\..\..\Terrain13\quad_list.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -76,27 +73,29 @@
       <Filter>ImGUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Terrain13\demo_config.h" />
-    <ClInclude Include="..\..\..\Terrain13\geomip_grid.h" />
-    <ClInclude Include="..\..\..\Terrain13\lod_manager.h" />
     <ClInclude Include="..\..\..\Terrain13\midpoint_disp_terrain.h" />
-    <ClInclude Include="..\..\..\Terrain13\simple_water.h" />
-    <ClInclude Include="..\..\..\Terrain13\simple_water_technique.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain13\texture_config.h" />
-    <ClInclude Include="..\..\..\Terrain13\triangle_list.h" />
+    <ClInclude Include="..\..\..\Terrain13\quad_list.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Terrain13\simple_water.fs">
+    <None Include="..\..\..\Common\Shaders\skydome.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Terrain13\simple_water.vs">
+    <None Include="..\..\..\Common\Shaders\skydome.vs">
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\..\Terrain13\terrain.fs">
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\..\Terrain13\terrain.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Terrain13\terrain.tcs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Terrain13\terrain.tes">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

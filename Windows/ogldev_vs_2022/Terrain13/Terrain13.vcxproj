@@ -28,6 +28,7 @@
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skydome.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skydome_technique.cpp" />
@@ -35,15 +36,11 @@
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\geomip_grid.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\lod_manager.cpp" />
     <ClCompile Include="..\..\..\Terrain13\midpoint_disp_terrain.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\simple_water.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\simple_water_technique.cpp" />
+    <ClCompile Include="..\..\..\Terrain13\quad_list.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\terrain_technique.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain_demo13.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\triangle_list.cpp" />
+    <ClCompile Include="..\..\..\Terrain13\terrain_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
@@ -56,26 +53,24 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\Terrain13\demo_config.h" />
-    <ClInclude Include="..\..\..\Terrain13\geomip_grid.h" />
-    <ClInclude Include="..\..\..\Terrain13\lod_manager.h" />
     <ClInclude Include="..\..\..\Terrain13\midpoint_disp_terrain.h" />
-    <ClInclude Include="..\..\..\Terrain13\simple_water.h" />
-    <ClInclude Include="..\..\..\Terrain13\simple_water_technique.h" />
+    <ClInclude Include="..\..\..\Terrain13\quad_list.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain13\texture_config.h" />
-    <ClInclude Include="..\..\..\Terrain13\triangle_list.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Terrain13\simple_water.fs" />
-    <None Include="..\..\..\Terrain13\simple_water.vs" />
+    <None Include="..\..\..\Common\Shaders\skydome.fs" />
+    <None Include="..\..\..\Common\Shaders\skydome.vs" />
     <None Include="..\..\..\Terrain13\terrain.fs" />
+    <None Include="..\..\..\Terrain13\terrain.tcs" />
+    <None Include="..\..\..\Terrain13\terrain.tes" />
     <None Include="..\..\..\Terrain13\terrain.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{F771435E-330F-40A5-B07B-59CF20A00220}</ProjectGuid>
+    <ProjectGuid>{9E5A2442-701E-42E1-A252-9094E4308A8D}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <ProjectName>Terrain13</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -180,7 +175,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mt.lib;glew32.lib;glfw3dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>meshoptimizer.lib;assimp-vc143-mt.lib;glew32.lib;glfw3dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

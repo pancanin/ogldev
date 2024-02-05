@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Terrain Rendering - demo 13 - Water
+    Terrain Rendering - demo 13 - Terrain Tessellation
 */
 
 #include "imgui.h"
@@ -48,39 +48,16 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 static int g_seed = 0;
 
-extern int gShowPoints;
 
-
-class TerrainDemo9
+class TerrainDemo13
 {
 public:
 
-    TerrainDemo9()
+    TerrainDemo13()
     {
-        m_waveParams[0].WaveLen = 1.0f;
-        m_waveParams[0].Speed = 1.0f;
-        m_waveParams[0].Amp = 1.0f;
-
-        m_waveParams[1].WaveLen = 1.0f;
-        m_waveParams[1].Speed = 1.0f;
-        m_waveParams[1].Amp = 1.0f;
-
-        m_waveParams[2].WaveLen = 1.0f;
-        m_waveParams[2].Speed = 1.0f;
-        m_waveParams[2].Amp = 1.0f;
-
-        m_waveParams[3].WaveLen = 1.0f;
-        m_waveParams[3].Speed = 1.0f;
-        m_waveParams[3].Amp = 1.0f;
-
-        m_terrain.SetWaveParam(0, m_waveParams[0]);
-        m_terrain.SetWaveParam(1, m_waveParams[1]);
-        m_terrain.SetWaveParam(2, m_waveParams[2]);
-        m_terrain.SetWaveParam(3, m_waveParams[3]);
     }
 
-
-    virtual ~TerrainDemo9()
+    virtual ~TerrainDemo13()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -90,11 +67,11 @@ public:
     {
         CreateWindow_(); // added '_' because of conflict with Windows.h
 
-        InitCallbacks();
-
-        InitCamera();
+        InitCallbacks();        
 
         InitTerrain();
+
+        InitCamera();
 
         InitGUI();
     }
@@ -111,31 +88,27 @@ public:
                 ImGui_ImplGlfw_NewFrame();
                 ImGui::NewFrame();
                                  
-                ImGui::Begin("Terrain Water Demo"); 
+                ImGui::Begin("Terrain Demo 5");                          // Create a window called "Hello, world!" and append into it.
 
-                ImGui::SliderFloat("Water height", &this->m_waterHeight, 0.0f, m_maxHeight);
-                m_terrain.SetWaterHeight(m_waterHeight);
+                ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
+                ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
 
-                ImGui::SliderFloat("Wave0: len", &this->m_waveParams[0].WaveLen, 0.0f, 500.0);
-                ImGui::SliderFloat("Wave0: speed", &this->m_waveParams[0].Speed, 0.01f, 50.0);
-                ImGui::SliderFloat("Wave0: amplitude", &this->m_waveParams[0].Amp, 0.1f, 20.0);
+                static float Height0 = 64.0f;
+                static float Height1 = 128.0f;
+                static float Height2 = 192.0f;
+                static float Height3 = 256.0f;
 
-                ImGui::SliderFloat("Wave1: len", &this->m_waveParams[1].WaveLen, 0.0f, 500.0);
-                ImGui::SliderFloat("Wave1: speed", &this->m_waveParams[1].Speed, 0.01f, 50.0);
-                ImGui::SliderFloat("Wave1: amplitude", &this->m_waveParams[1].Amp, 0.1f, 20.0);
+                ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
+                ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
+                ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
+                ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
 
-                ImGui::SliderFloat("Wave2: len", &this->m_waveParams[2].WaveLen, 0.0f, 500.0);
-                ImGui::SliderFloat("Wave2: speed", &this->m_waveParams[2].Speed, 0.01f, 50.0);
-                ImGui::SliderFloat("Wave2: amplitude", &this->m_waveParams[2].Amp, 0.1f, 20.0);
-
-                ImGui::SliderFloat("Wave3: len", &this->m_waveParams[3].WaveLen, 0.0f, 500.0);
-                ImGui::SliderFloat("Wave3: speed", &this->m_waveParams[3].Speed, 0.01f, 50.0);
-                ImGui::SliderFloat("Wave3: amplitude", &this->m_waveParams[3].Amp, 0.1f, 20.0);
-
-                m_terrain.SetWaveParam(0, m_waveParams[0]);
-                m_terrain.SetWaveParam(1, m_waveParams[1]);
-                m_terrain.SetWaveParam(2, m_waveParams[2]);
-                m_terrain.SetWaveParam(3, m_waveParams[3]);
+                if (ImGui::Button("Generate")) {
+                    m_terrain.Destroy();
+                    srand(g_seed);
+                    m_terrain.CreateMidpointDisplacement(m_terrainSize, m_numPatches, m_roughness, m_minHeight, m_maxHeight);
+                    m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
+                }
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
                 ImGui::End();
@@ -163,10 +136,12 @@ public:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
+        m_pGameCamera->OnRender();
+
         static float foo = 0.0f;
         foo += 0.002f;
 
-      /*  float S = (float)m_terrainSize;
+       /* float S = (float)m_terrainSize;
         float R = 2.5f * S;
 
         Vector3f Pos(S + cosf(foo) * R, m_maxHeight + 250.0f, S + sinf(foo) * R);
@@ -177,12 +152,10 @@ public:
         m_pGameCamera->SetTarget(Target);
         m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);*/
 
-        float y = min(-0.4f, cosf(foo));
-        Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
+        float x = min(-0.4f, cosf(foo));
+        Vector3f LightDir(x, -1.0f, 0.0f);
 
-        Vector3f LightDir2(1.0f, -1.0f, 0.0f);
-
-        m_terrain.SetLightDir(LightDir);
+      //  m_terrain.SetLightDir(LightDir);
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -232,29 +205,7 @@ public:
 
             case GLFW_KEY_SPACE:
                 m_showGui = !m_showGui;
-                break;
-
-            case GLFW_KEY_0:
-                gShowPoints = 0;
-                break;
-
-            case GLFW_KEY_1:
-                gShowPoints = 1;
-                break;
-
-            case GLFW_KEY_2:
-                gShowPoints = 2;
-                break;
-
-            case GLFW_KEY_F:
-                m_waterHeight += 1.0f;
-                m_terrain.SetWaterHeight(m_waterHeight);
-                break;
-
-            case GLFW_KEY_V:
-                m_waterHeight -= 1.0f;
-                m_terrain.SetWaterHeight(m_waterHeight);
-                break;
+                break;            
             }
         }
 
@@ -278,7 +229,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Simple Water");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Demo 12");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -294,23 +245,32 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(50.0f, 220.0f, 120.0f);
-        Vector3f Target(0.0f, -0.15f, -1.0f);
+        float CameraX = m_terrain.GetWorldSize() / 2.0f;
+        float CameraZ = CameraX;
+        Vector3f Pos(CameraX, 0.0f, CameraZ);
+    //    Vector3f Pos(0.0f, 0.0f, 0.0f);
+        Pos = m_terrain.ConstrainCameraPosToTerrain(Pos);
+        Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
+     //   Pos = Vector3f(3840.0f, 151.946808f, 3840.0f);
+      //  Target = Vector3f(-0.896419f, -0.443071f, 0.010951f);
+
         float FOV = 45.0f;
-        float zNear = 1.0f;
+        float zNear = 0.1f;
         float zFar = Z_FAR;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+        m_pGameCamera->SetSpeed(0.05f);
     }
     
 
     void InitTerrain()
     {
-        float WorldScale = 4.0f;
-        float TextureScale = 16.0f;
+        float WorldScale = 128.0f;
+        float TextureScale = 1.0f;
+
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/rocky_trail_02_diff_1k.jpg");
         TextureFilenames.push_back("../Content/textures/coast_sand_rocks_02_diff_2k.jpg");        
@@ -319,13 +279,11 @@ private:
 
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
-        m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
+        m_terrain.CreateMidpointDisplacement(m_terrainSize, m_numPatches, m_roughness, m_minHeight, m_maxHeight);
 
-        Vector3f LightDir(0.0f, -1.0f, 0.0f);
+        Vector3f LightDir(-1.0f, -0.2f, 0.0f);
 
         m_terrain.SetLightDir(LightDir);
-
-        m_terrain.SetWaterHeight(m_waterHeight);
     }
 
 
@@ -359,18 +317,16 @@ private:
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
     bool m_isPaused = false;
-    int m_terrainSize = 1025;
+    int m_terrainSize = 1024;
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
-    float m_maxHeight = 450.0f;
-    int m_patchSize = 33;
+    float m_maxHeight = 500.0f;
+    int m_numPatches = 64;
     float m_counter = 0.0f;
-    bool m_constrainCamera = false;	
-    float m_waterHeight = 200.0f;
-    WaveParam m_waveParams[MAX_WAVES];
+    bool m_constrainCamera = false;
 };
 
-TerrainDemo9* app = NULL;
+TerrainDemo13* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -405,12 +361,12 @@ int main(int argc, char** argv)
 
     srand(g_seed);
 
-    app = new TerrainDemo9();
+    app = new TerrainDemo13();
 
     app->Init();
 
     glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
-    glFrontFace(GL_CW);
+    glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);

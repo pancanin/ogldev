@@ -39,7 +39,7 @@ BaseTerrain::~BaseTerrain()
 void BaseTerrain::Destroy()
 {
     m_heightMap.Destroy();
-    m_geomipGrid.Destroy();
+    m_quadList.Destroy();
 }
 
 
@@ -50,17 +50,17 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         printf("Error initializing tech\n");
         exit(0);
     }
-	
+
     if (TextureFilenames.size() != ARRAY_SIZE_IN_ELEMENTS(m_pTextures)) {
-        printf("%s:%d - number of provided textures (%zu) is not equal to the size of the texture array (%zu)\n",
-               __FILE__, __LINE__, TextureFilenames.size(), ARRAY_SIZE_IN_ELEMENTS(m_pTextures));
+        printf("%s:%d - number of provided textures (%lud) is not equal to the size of the texture array (%lud)\n",
+               __FILE__, __LINE__, (unsigned long)TextureFilenames.size(), (unsigned long)ARRAY_SIZE_IN_ELEMENTS(m_pTextures));
         exit(0);
     }
 
     m_worldScale = WorldScale;
-    m_textureScale = TextureScale;		
+    m_textureScale = TextureScale;
 
-    for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
+    for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
@@ -71,9 +71,11 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
 
 void BaseTerrain::Finalize()
 {
-    m_geomipGrid.CreateGeomipGrid(m_terrainSize, m_terrainSize, m_patchSize, this);
+    m_quadList.CreateQuadList(m_numPatches, m_numPatches, this);
 
-    m_water.Init(m_terrainSize, m_worldScale);
+  //  m_heightMap.PrintFloat();
+
+    m_heightMapTexture.LoadF32(m_terrainSize, m_terrainSize, m_heightMap.GetBaseAddr());
 }
 
 
@@ -109,9 +111,7 @@ void BaseTerrain::LoadFromFile(const char* pFilename)
     // how do we know the patch size at this point?
     assert(0);
 
-    m_geomipGrid.CreateGeomipGrid(m_terrainSize, m_terrainSize, m_patchSize, this);
-	
-	m_water.Init(m_terrainSize, m_worldScale);
+    m_quadList.CreateQuadList(m_numPatches, m_numPatches, this);
 }
 
 
@@ -159,20 +159,11 @@ void BaseTerrain::SaveToFile(const char* pFilename)
 
 void BaseTerrain::Render(const BasicCamera& Camera)
 {
-    //RenderTerrain(Camera);
- 
-    RenderWater(Camera);
- 
-    //m_pSkydome->Render(Camera);	
-}
-
-
-void BaseTerrain::RenderTerrain(const BasicCamera& Camera)
-{
     Matrix4f VP = Camera.GetViewProjMatrix();
     Matrix4f View = Camera.GetMatrix();
 
     m_terrainTech.Enable();
+    m_terrainTech.SetViewMatrix(View);
     m_terrainTech.SetVP(VP);
 
     for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
@@ -181,16 +172,15 @@ void BaseTerrain::RenderTerrain(const BasicCamera& Camera)
         }
     }
 
+    m_heightMapTexture.Bind(HEIGHT_MAP_TEXTURE_UNIT);
+	
     m_terrainTech.SetLightDir(m_lightDir);
 
-    m_geomipGrid.Render(Camera.GetPos(), VP);	
-}
+    glFrontFace(GL_CCW);
+    m_quadList.Render();
 
-
-void BaseTerrain::RenderWater(const BasicCamera & Camera)
-{
-    Matrix4f VP = Camera.GetViewProjMatrix();
-    m_water.Render(VP);
+    glFrontFace(GL_CW); // hack....
+    m_pSkydome->Render(Camera);
 }
 
 
@@ -223,6 +213,7 @@ Vector3f BaseTerrain::ConstrainCameraPosToTerrain(const Vector3f& CameraPos)
 {
     Vector3f NewCameraPos = CameraPos;
 
+    // Make sure camera doesn't go outside of the terrain bounds
     if (CameraPos.x < 0.0f) {
         NewCameraPos.x = 0.0f;
     }
